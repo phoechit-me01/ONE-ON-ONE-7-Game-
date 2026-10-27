@@ -1,0 +1,478 @@
+{
+  "entities": {
+    "Wallet": {
+      "title": "Wallet",
+      "description": "User currency balances for Gold and Gems",
+      "type": "object",
+      "properties": {
+        "gold": {
+          "type": "number",
+          "description": "Accumulated Gold balance"
+        },
+        "gems": {
+          "type": "number",
+          "description": "Accumulated Gems balance"
+        }
+      },
+      "required": ["gold", "gems"]
+    },
+    "User": {
+      "title": "User",
+      "description": "User root profile containing dynamic wallet balances, gift metrics, lifetime leaderboard stats, level progression, showcase slots, and vault matrix slots",
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string",
+          "description": "Player display name"
+        },
+        "gold": {
+          "type": "number",
+          "description": "Root dynamic Gold wallet balance"
+        },
+        "gems": {
+          "type": "number",
+          "description": "Root dynamic Gems wallet balance"
+        },
+        "totalGiftPoints": {
+          "type": "number",
+          "description": "Cumulative gift points from currently held ownedGifts"
+        },
+        "receivedGiftsCount": {
+          "type": "number",
+          "description": "Total number of currently held gifts in ownedGifts"
+        },
+        "pin_code": {
+          "type": "string",
+          "description": "Security PIN / password required for P2P gift transactions"
+        },
+        "wallet": {
+          "$ref": "Wallet",
+          "type": "object",
+          "description": "Mirrored currency wallet object"
+        },
+        "unlocked_level": {
+          "type": "number",
+          "description": "Current highest unlocked level"
+        },
+        "current_level": {
+          "type": "number",
+          "description": "Current active stage / level"
+        },
+        "total_stars": {
+          "type": "number",
+          "description": "Total Stars collected"
+        },
+        "lifetime_gold_earned": {
+          "type": "number",
+          "description": "Cumulative Gold earned across all gameplay sessions without deductions"
+        },
+        "lifetime_gems_earned": {
+          "type": "number",
+          "description": "Cumulative Gems earned across all gameplay sessions without deductions"
+        },
+        "total_score": {
+          "type": "number",
+          "description": "Cumulative score across all completed matches"
+        },
+        "forfeited_matches": {
+          "type": "number",
+          "description": "Total forfeited / given-up matches"
+        },
+        "total_matches_played": {
+          "type": "number",
+          "description": "Total matches played (completed + forfeited)"
+        },
+        "owned_items_count": {
+          "type": "number",
+          "description": "Count of unique owned shop items"
+        },
+        "high_score": {
+          "type": "number",
+          "description": "Best single-match score record"
+        },
+        "best_time_seconds": {
+          "type": "number",
+          "description": "Fastest level completion time in seconds"
+        },
+        "best_moves_count": {
+          "type": "number",
+          "description": "Fewest moves on a completed level"
+        },
+        "vault_inventory": {
+          "type": "array",
+          "description": "Owned shop item IDs"
+        },
+        "home_slots": {
+          "type": "array",
+          "description": "3-slot array for Home Screen Profile Showcase"
+        },
+        "equipped_vault_slots": {
+          "type": "object",
+          "description": "Map of slot_1 through slot_30 for DataBoard 6x5 Trophy & Badge Vault Matrix"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Epoch millisecond timestamp of last update"
+        }
+      },
+      "required": ["gold", "gems", "totalGiftPoints", "receivedGiftsCount"]
+    },
+    "GiftShopItem": {
+      "title": "GiftShopItem",
+      "description": "110-item Gift catalog document stored in shopItems/{itemId}",
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "description": "Unique gift item ID (ONE_GIFT_001 .. ONE_GIFT_110)"
+        },
+        "itemName": {
+          "type": "string",
+          "description": "Display name of the gift item"
+        },
+        "category": {
+          "type": "string",
+          "description": "Gift thematic category"
+        },
+        "tierTitle": {
+          "type": "string",
+          "description": "Rarity tier title (Rare, Deluxe, Epic, Mythical, Celestial, Legendary)"
+        },
+        "currencyType": {
+          "type": "string",
+          "enum": ["GOLD", "GEMS"],
+          "description": "Currency required to purchase/send gift"
+        },
+        "basePrice": {
+          "type": "number",
+          "description": "Gross purchase price in GOLD or GEMS"
+        },
+        "giftPoints": {
+          "type": "number",
+          "description": "Gift points awarded to recipient"
+        },
+        "platformFeePercent": {
+          "type": "number",
+          "description": "Resale platform fee percentage (25%)"
+        },
+        "resaleEligible": {
+          "type": "boolean",
+          "description": "Whether recipient can resell gift for 75% net value"
+        },
+        "animationType": {
+          "type": "string",
+          "description": "Visual effect preset (shimmer, pulse, floating)"
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Google Drive asset file ID"
+        },
+        "itemAssetUrl": {
+          "type": "string",
+          "description": "Renderable PNG asset URL"
+        },
+        "slotIndex": {
+          "type": "number",
+          "description": "Assigned slot index from 0 to 109"
+        }
+      },
+      "required": [
+        "itemId",
+        "itemName",
+        "category",
+        "tierTitle",
+        "currencyType",
+        "basePrice",
+        "giftPoints",
+        "itemAssetUrl",
+        "slotIndex"
+      ]
+    },
+    "OwnedGift": {
+      "title": "OwnedGift",
+      "description": "Received P2P gift document stored in users/{userId}/ownedGifts/{giftDocId}",
+      "type": "object",
+      "properties": {
+        "itemId": {
+          "type": "string",
+          "description": "Static copy of gift itemId"
+        },
+        "itemName": {
+          "type": "string",
+          "description": "Static copy of gift itemName"
+        },
+        "category": {
+          "type": "string",
+          "description": "Static copy of gift category"
+        },
+        "tierTitle": {
+          "type": "string",
+          "description": "Static copy of gift tierTitle"
+        },
+        "currencyType": {
+          "type": "string",
+          "enum": ["GOLD", "GEMS"],
+          "description": "Static copy of gift currencyType"
+        },
+        "basePrice": {
+          "type": "number",
+          "description": "Static copy of gift basePrice"
+        },
+        "giftPoints": {
+          "type": "number",
+          "description": "Static copy of giftPoints"
+        },
+        "platformFeePercent": {
+          "type": "number",
+          "description": "Static copy of resale fee percentage (25%)"
+        },
+        "resaleEligible": {
+          "type": "boolean",
+          "description": "Whether gift is eligible for 75% resale"
+        },
+        "animationType": {
+          "type": "string",
+          "description": "Static copy of animationType"
+        },
+        "fileId": {
+          "type": "string",
+          "description": "Static copy of asset fileId"
+        },
+        "itemAssetUrl": {
+          "type": "string",
+          "description": "Static copy of itemAssetUrl"
+        },
+        "senderId": {
+          "type": "string",
+          "description": "Sender user document ID"
+        },
+        "senderName": {
+          "type": "string",
+          "description": "Sender display name"
+        },
+        "recipientId": {
+          "type": "string",
+          "description": "Recipient user document ID"
+        },
+        "receivedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Firestore Timestamp when gift was received"
+        },
+        "message": {
+          "type": "string",
+          "description": "Personal message attached by sender"
+        },
+        "slotIndex": {
+          "type": "number",
+          "description": "Vault slot index from 0 to 109"
+        },
+        "equippedSlot": {
+          "type": "string",
+          "description": "Optional showcase/equipped slot reference"
+        }
+      },
+      "required": [
+        "itemId",
+        "itemName",
+        "currencyType",
+        "basePrice",
+        "giftPoints",
+        "itemAssetUrl",
+        "senderId",
+        "senderName",
+        "receivedAt",
+        "message",
+        "slotIndex"
+      ]
+    },
+    "SentGift": {
+      "title": "SentGift",
+      "description": "Immutable sent gift history log stored in users/{userId}/sentGifts/{giftDocId} with resale strictly disabled",
+      "type": "object",
+      "properties": {
+        "itemId": { "type": "string", "description": "Dispatched gift itemId" },
+        "itemName": { "type": "string", "description": "Dispatched gift itemName" },
+        "category": { "type": "string", "description": "Dispatched gift category" },
+        "tierTitle": { "type": "string", "description": "Dispatched gift tierTitle" },
+        "currencyType": {
+          "type": "string",
+          "enum": ["GOLD", "GEMS"],
+          "description": "Currency spent to send gift"
+        },
+        "basePrice": { "type": "number", "description": "Price paid by sender" },
+        "giftPoints": { "type": "number", "description": "Gift points awarded to recipient" },
+        "fileId": { "type": "string", "description": "Asset fileId" },
+        "itemAssetUrl": { "type": "string", "description": "Renderable PNG asset URL" },
+        "senderId": { "type": "string", "description": "Sender user document ID" },
+        "senderName": { "type": "string", "description": "Sender display name" },
+        "recipientId": { "type": "string", "description": "Recipient user document ID" },
+        "recipientName": { "type": "string", "description": "Recipient display name" },
+        "sentAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Firestore Timestamp when gift was dispatched"
+        },
+        "message": { "type": "string", "description": "Attached personal message" },
+        "slotIndex": { "type": "number", "description": "Assigned recipient slot index (0..109)" },
+        "resaleEligible": { "type": "boolean", "description": "Always false on sent history logs" }
+      },
+      "required": [
+        "itemId",
+        "itemName",
+        "currencyType",
+        "basePrice",
+        "giftPoints",
+        "itemAssetUrl",
+        "senderId",
+        "senderName",
+        "recipientId",
+        "recipientName",
+        "sentAt",
+        "message",
+        "resaleEligible"
+      ]
+    },
+    "ShopItem": {
+      "title": "ShopItem",
+      "description": "56-item Prestige Shop catalog item stored in shop_items/{itemId}",
+      "type": "object",
+      "properties": {
+        "item_id": {
+          "type": "string",
+          "description": "Unique identifier for the shop item"
+        },
+        "item_name": {
+          "type": "string",
+          "description": "Display name of the Star, Crown, or Frame"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["star", "crown", "frame"],
+          "description": "Item category"
+        },
+        "tier": {
+          "type": "string",
+          "enum": ["Bronze", "Silver", "Gold", "Diamond", "Royal", "Special"],
+          "description": "Progression tier"
+        },
+        "price_gold": {
+          "type": "number",
+          "description": "Gold cost (0 if Gem-priced)"
+        },
+        "price_gems": {
+          "type": "number",
+          "description": "Gem cost (0 if Gold-priced)"
+        },
+        "image_url": {
+          "type": "string",
+          "description": "PNG asset URL"
+        }
+      },
+      "required": ["item_id", "item_name", "category", "tier", "price_gold", "price_gems", "image_url"]
+    },
+    "LevelProgress": {
+      "title": "LevelProgress",
+      "description": "Canonical gameplay metrics and reward record for a single level",
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number",
+          "description": "Final calculated score achieved on the level"
+        },
+        "time_seconds": {
+          "type": "number",
+          "description": "Total elapsed gameplay time in seconds"
+        },
+        "moves_count": {
+          "type": "number",
+          "description": "Total tile moves performed"
+        },
+        "restarts_count": {
+          "type": "number",
+          "description": "Total board restarts performed"
+        },
+        "grid_used": {
+          "type": "string",
+          "description": "Grid format used: 4x3 or 6x4"
+        },
+        "show_number_used": {
+          "type": "boolean",
+          "description": "Whether Show Number overlay was active on the level"
+        },
+        "status": {
+          "type": "string",
+          "description": "Level status: locked, unlocked, completed, or given_up"
+        },
+        "gold": {
+          "type": "number",
+          "description": "Gold earned on the level"
+        },
+        "gems": {
+          "type": "number",
+          "description": "Gems earned on the level"
+        }
+      },
+      "required": [
+        "score",
+        "time_seconds",
+        "moves_count",
+        "restarts_count",
+        "grid_used",
+        "show_number_used",
+        "status",
+        "gold",
+        "gems"
+      ]
+    },
+    "LevelMaster": {
+      "title": "LevelMaster",
+      "description": "Master reference definition and source image for a level",
+      "type": "object",
+      "properties": {
+        "level_id": {
+          "type": "number",
+          "description": "Level index number"
+        },
+        "image_url": {
+          "type": "string",
+          "description": "Source image URL for the level puzzle"
+        },
+        "is_special": {
+          "type": "boolean",
+          "description": "Whether the level is a special % 6 level"
+        }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "User root profile with gold, gems, totalGiftPoints, receivedGiftsCount, and lifetime stats"
+    },
+    "/users/{userId}/ownedGifts/{giftDocId}": {
+      "schema": "OwnedGift",
+      "description": "Received P2P gifts sub-collection (slotIndex 0..109) held by the recipient"
+    },
+    "/users/{userId}/sentGifts/{giftDocId}": {
+      "schema": "SentGift",
+      "description": "Immutable Sent History log of gifts dispatched by the user (resale disabled)"
+    },
+    "/users/{userId}/level_progress/{levelId}": {
+      "schema": "LevelProgress",
+      "description": "Individual level gameplay metrics and completion records"
+    },
+    "/shopItems/{itemId}": {
+      "schema": "GiftShopItem",
+      "description": "110-item Gift catalog collection"
+    },
+    "/shop_items/{itemId}": {
+      "schema": "ShopItem",
+      "description": "56-item Prestige Shop catalog collection"
+    },
+    "/levels_master/{levelId}": {
+      "schema": "LevelMaster",
+      "description": "Master puzzle definitions containing image URLs"
+    }
+  }
+}

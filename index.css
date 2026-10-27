@@ -1,0 +1,468 @@
+@import "tailwindcss";
+
+:root {
+  --bg-primary: #FAF8F5;
+  --surface-container: #FFFFFF;
+  --text-primary: #2C3E50;
+  --border-primary: #E2E8F0;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #FAF8F5;
+  color: #2C3E50;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ==========================================================================
+   GDD Sections 5 & 6: PNG Item Micro-Animations & Tactile Slot Feedback
+   ========================================================================== */
+
+/* 1. Shimmer / Shine Sweep Effect for precious items (Crowns, Diamond/Special Stars, Elite Frames) */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  45%,
+  100% {
+    transform: translateX(160%) skewX(-20deg);
+  }
+}
+
+.item-shimmer-sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+  z-index: 20;
+}
+
+.item-shimmer-sweep::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 55%;
+  height: 140%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.42) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: shimmer 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+/* 2. Vivid Floating / Bobbing Effect for PNG Item Assets (Slots & Thumbnails) */
+@keyframes itemFloat {
+  0%,
+  100% {
+    transform: translateY(4px) scale(0.98);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.04);
+  }
+}
+
+.item-float-bob {
+  animation: itemFloat 2.1s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+/* 2B. Enhanced Large Floating / Bobbing Effect for Shop Cards & High-Res Detail Preview */
+@keyframes itemFloatLarge {
+  0%,
+  100% {
+    transform: translateY(6px) scale(0.98);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+  }
+}
+
+.item-float-bob-lg {
+  animation: itemFloatLarge 2.3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+/* 3. Soft Pulse / Breathing Effect for Equipped Showcase & Vault Items */
+@keyframes itemSoftPulse {
+  0%,
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 0.92;
+    filter: brightness(1.16);
+  }
+}
+
+.item-equipped-pulse {
+  animation: itemSoftPulse 2.6s ease-in-out infinite;
+  will-change: opacity, filter;
+}
+
+/* 4. Active Tap Feedback: scale(0.95) on tap */
+.slot-tap-feedback {
+  transition: transform 90ms ease-out;
+}
+
+.slot-tap-feedback:active {
+  transform: scale(0.95);
+}
+
+/* ==========================================================================
+   110-Item Gift System: GPU-Accelerated Tier FX (transform & opacity ONLY)
+   ========================================================================== */
+
+/* --- Tier 1: Bronze / Silver / Rare / Deluxe (Subtle shimmer & soft pulse) --- */
+@keyframes giftSoftPulseGpu {
+  0%,
+  100% {
+    transform: scale(0.985);
+    opacity: 0.92;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+@keyframes giftSubtleShimmerGpu {
+  0% {
+    transform: translate3d(-145%, 0, 0) skewX(-20deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.55;
+  }
+  45%,
+  100% {
+    transform: translate3d(165%, 0, 0) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+.gift-fx-bronze-silver .gift-asset-motion {
+  animation: giftSoftPulseGpu 2.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.gift-shimmer-subtle {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 15;
+}
+
+.gift-shimmer-subtle::after {
+  content: "";
+  position: absolute;
+  top: -20%;
+  left: 0;
+  width: 52%;
+  height: 140%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(226, 232, 240, 0.28) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: giftSubtleShimmerGpu 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+/* --- Tier 2: Gold / Diamond / Epic / Mythical (Floating, glowing aura & border gradient spin) --- */
+@keyframes giftFloatGpu {
+  0%,
+  100% {
+    transform: translate3d(0, 3.5px, 0) scale(0.98);
+  }
+  50% {
+    transform: translate3d(0, -4.5px, 0) scale(1.04);
+  }
+}
+
+@keyframes giftAuraGlowGpu {
+  0%,
+  100% {
+    transform: scale(0.86);
+    opacity: 0.36;
+  }
+  50% {
+    transform: scale(1.12);
+    opacity: 0.78;
+  }
+}
+
+@keyframes giftBorderSpinGpu {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.gift-fx-gold-diamond .gift-asset-motion {
+  animation: giftFloatGpu 2.3s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.gift-aura-disc {
+  position: absolute;
+  inset: 12%;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    circle,
+    rgba(251, 191, 36, 0.42) 0%,
+    rgba(56, 189, 248, 0.24) 52%,
+    rgba(0, 0, 0, 0) 74%
+  );
+  animation: giftAuraGlowGpu 2.4s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.gift-border-anim-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gift-border-anim-ring::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(251, 191, 36, 0.9),
+    rgba(56, 189, 248, 0.85),
+    rgba(251, 191, 36, 0.2),
+    rgba(56, 189, 248, 0.9),
+    rgba(251, 191, 36, 0.9)
+  );
+  animation: giftBorderSpinGpu 4.2s linear infinite;
+  will-change: transform;
+}
+
+.gift-border-anim-ring::after {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  background: #000000;
+  border-radius: inherit;
+}
+
+/* --- Tier 3: Legendary / Celestial / Royal / Max (Full holographic shine & burst sparkles) --- */
+@keyframes giftHoloSweepGpu {
+  0% {
+    transform: translate3d(-135%, 0, 0) skewX(-24deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.72;
+  }
+  55%,
+  100% {
+    transform: translate3d(155%, 0, 0) skewX(-24deg);
+    opacity: 0;
+  }
+}
+
+@keyframes giftSparkleBurstA {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.25) rotate(0deg);
+    opacity: 0;
+  }
+  35% {
+    transform: translate3d(-5px, -6px, 0) scale(1.1) rotate(45deg);
+    opacity: 1;
+  }
+  75% {
+    transform: translate3d(-8px, -10px, 0) scale(0.4) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes giftSparkleBurstB {
+  0%,
+  15%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.25) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: translate3d(6px, -5px, 0) scale(1.15) rotate(-45deg);
+    opacity: 1;
+  }
+  85% {
+    transform: translate3d(9px, -9px, 0) scale(0.35) rotate(-90deg);
+    opacity: 0;
+  }
+}
+
+@keyframes giftSparkleBurstC {
+  0%,
+  30%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(0.2) rotate(0deg);
+    opacity: 0;
+  }
+  65% {
+    transform: translate3d(5px, 6px, 0) scale(1.05) rotate(60deg);
+    opacity: 0.95;
+  }
+  92% {
+    transform: translate3d(8px, 9px, 0) scale(0.3) rotate(110deg);
+    opacity: 0;
+  }
+}
+
+.gift-fx-legendary-max .gift-asset-motion {
+  animation: giftFloatGpu 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  will-change: transform;
+}
+
+.gift-aura-legendary {
+  position: absolute;
+  inset: 8%;
+  border-radius: 9999px;
+  pointer-events: none;
+  z-index: 2;
+  background: radial-gradient(
+    circle,
+    rgba(244, 63, 94, 0.45) 0%,
+    rgba(168, 85, 247, 0.34) 45%,
+    rgba(56, 189, 248, 0.2) 68%,
+    rgba(0, 0, 0, 0) 78%
+  );
+  animation: giftAuraGlowGpu 2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.gift-border-holo-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gift-border-holo-ring::before {
+  content: "";
+  position: absolute;
+  inset: -45%;
+  background: conic-gradient(
+    from 0deg,
+    #f43f5e,
+    #fbbf24,
+    #34d399,
+    #38bdf8,
+    #a855f7,
+    #f43f5e
+  );
+  animation: giftBorderSpinGpu 3s linear infinite;
+  will-change: transform;
+}
+
+.gift-border-holo-ring::after {
+  content: "";
+  position: absolute;
+  inset: 1.5px;
+  background: #000000;
+  border-radius: inherit;
+}
+
+.gift-holo-sheen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 16;
+}
+
+.gift-holo-sheen::after {
+  content: "";
+  position: absolute;
+  top: -25%;
+  left: 0;
+  width: 68%;
+  height: 150%;
+  background: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(244, 114, 182, 0.28) 28%,
+    rgba(253, 224, 71, 0.34) 48%,
+    rgba(56, 189, 248, 0.34) 68%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: giftHoloSweepGpu 2.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform, opacity;
+}
+
+.gift-sparkle-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+  z-index: 18;
+  will-change: transform, opacity;
+}
+
+.gift-sparkle-dot-1 {
+  top: 16%;
+  left: 18%;
+  animation: giftSparkleBurstA 2.2s ease-out infinite;
+}
+
+.gift-sparkle-dot-2 {
+  top: 18%;
+  right: 16%;
+  animation: giftSparkleBurstB 2.4s ease-out infinite;
+}
+
+.gift-sparkle-dot-3 {
+  bottom: 18%;
+  right: 20%;
+  animation: giftSparkleBurstC 2.5s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .item-shimmer-sweep::after,
+  .item-float-bob,
+  .item-float-bob-lg,
+  .item-equipped-pulse,
+  .gift-fx-bronze-silver .gift-asset-motion,
+  .gift-shimmer-subtle::after,
+  .gift-fx-gold-diamond .gift-asset-motion,
+  .gift-aura-disc,
+  .gift-border-anim-ring::before,
+  .gift-fx-legendary-max .gift-asset-motion,
+  .gift-aura-legendary,
+  .gift-border-holo-ring::before,
+  .gift-holo-sheen::after,
+  .gift-sparkle-dot-1,
+  .gift-sparkle-dot-2,
+  .gift-sparkle-dot-3 {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "One-on-One 7 Game",
+  "description": "One-on-One 7 Game with Firebase integration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

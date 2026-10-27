@@ -1,0 +1,105 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net: default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isAuthorizedPlayer(userId) {
+      return request.auth != null && (
+        request.auth.uid == userId ||
+        userId == 'user_phoe_chit' ||
+        userId == 'user_tin_moe_hlaing'
+      );
+    }
+
+    function isValidOwnedGiftPayload(data) {
+      return data.itemId is string && data.itemId.size() <= 128 &&
+        data.itemName is string && data.itemName.size() <= 200 &&
+        data.itemAssetUrl is string && data.itemAssetUrl.size() <= 1024 &&
+        data.currencyType in ['GOLD', 'GEMS'] &&
+        data.basePrice is number && data.basePrice >= 0 &&
+        data.giftPoints is number && data.giftPoints >= 0 &&
+        data.senderId is string && data.senderId.size() <= 128 &&
+        data.senderName is string && data.senderName.size() <= 128 &&
+        data.message is string && data.message.size() <= 500 &&
+        data.slotIndex is int && data.slotIndex >= 0 && data.slotIndex <= 109;
+    }
+
+    function isValidSentGiftPayload(data, senderUserId) {
+      return data.itemId is string && data.itemId.size() <= 128 &&
+        data.itemName is string && data.itemName.size() <= 200 &&
+        data.itemAssetUrl is string && data.itemAssetUrl.size() <= 1024 &&
+        data.currencyType in ['GOLD', 'GEMS'] &&
+        data.basePrice is number && data.basePrice >= 0 &&
+        data.giftPoints is number && data.giftPoints >= 0 &&
+        data.senderId == senderUserId &&
+        data.recipientId is string && data.recipientId != senderUserId &&
+        data.recipientName is string && data.recipientName.size() <= 128 &&
+        data.message is string && data.message.size() <= 500 &&
+        data.resaleEligible == false;
+    }
+
+    // Master level metadata and puzzle images
+    match /levels_master/{levelId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 110-item Gift catalog (`shopItems`)
+    match /shopItems/{itemId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && isValidId(itemId);
+      allow delete: if false;
+    }
+
+    // 56-item Prestige Shop catalog (`shop_items`)
+    match /shop_items/{itemId} {
+      allow read: if true;
+      allow create, update: if request.auth != null && isValidId(itemId);
+      allow delete: if false;
+    }
+
+    // User root profiles, dynamic wallets, gift metrics, showcase slots, and 6x5 vault matrix
+    match /users/{userId} {
+      allow read, write: if isAuthorizedPlayer(userId);
+
+      // Subcollection for received P2P gifts (slotIndex 0..109) and recipient-only 75% resale economy
+      match /ownedGifts/{giftDocId} {
+        allow get: if isAuthorizedPlayer(userId) && isValidId(giftDocId);
+        allow list: if isAuthorizedPlayer(userId);
+        allow create: if isAuthorizedPlayer(userId) &&
+          isValidId(giftDocId) &&
+          request.resource.data.senderId != userId &&
+          isValidOwnedGiftPayload(request.resource.data);
+        // Senders and clients cannot modify gifts once dispatched
+        allow update: if false;
+        // Only the recipient holding the gift in their own vault can delete via 75% resale
+        allow delete: if isAuthorizedPlayer(userId) &&
+          isValidId(giftDocId) &&
+          resource.data.senderId != userId;
+      }
+
+      // Immutable Sent History subcollection (`users/{userId}/sentGifts/{giftDocId}`) — resale disabled
+      match /sentGifts/{giftDocId} {
+        allow get: if isAuthorizedPlayer(userId) && isValidId(giftDocId);
+        allow list: if isAuthorizedPlayer(userId);
+        allow create: if isAuthorizedPlayer(userId) &&
+          isValidId(giftDocId) &&
+          isValidSentGiftPayload(request.resource.data, userId);
+        allow update, delete: if false;
+      }
+
+      // Subcollection for level progress (unlocked, completed, given_up)
+      match /level_progress/{levelId} {
+        allow read, write: if isAuthorizedPlayer(userId);
+      }
+    }
+  }
+}
